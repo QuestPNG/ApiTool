@@ -2,4 +2,17 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="crust">#FF232634</color>
+    <color name="mantle">#FF292c3c</color>
+    <color name="base">#FF303446</color>
+    <color name="surface_0">#FF414559</color>
+    <color name="surface_1">#FF51576d</color>
+    <color name="surface_2">#FF626880</color>
+    <color name="text">#FFc6d0f5</color>
+
+    <color name="green">#FFa6d189</color>
+    <color name="red">#FFe78284</color>
+    <color name="yellow">#FFe5c890</color>
+    <color name="peach">#FFef9f76</color>
 </resources>

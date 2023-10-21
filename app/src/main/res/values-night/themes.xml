@@ -3,5 +3,22 @@
     <style name="Base.Theme.ApiTool" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+
+        <item name="colorPrimary">@color/yellow</item>
+        <item name="colorPrimaryDark">@color/peach</item>
+        <item name="colorAccent">@color/green</item>
+
+        <item name="colorSurface">@color/crust</item>
+        <item name="android:colorBackground">@color/mantle</item>
+        <item name="colorSurfaceContainer">@color/mantle</item>
+
+        <item name="colorOnSurface">@color/text</item>
+
+        <!--<item name="editTextStyle">@style/EditTextStyle</item>-->
+    </style>
+
+    <style name="EditTextStyle" parent="@android:style/Widget.EditText">
+        <item name="android:background">@drawable/edit_text_shape</item>
+        <item name="android:textColor">@color/text</item>
     </style>
 </resources>
