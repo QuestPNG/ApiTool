@@ -10,10 +10,15 @@
     <string name="url_hint">Enter your url...</string>
     <string name="body_prompt">Body</string>
     <string name="response_prompt">Response</string>
+    <string name="send_button">Send</string>
 
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
+    <string-array name="method_array">
+        <item>Get</item>
+        <item>Post</item>
+    </string-array>
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
         volutpat, dolor id interdum ullamcorper, risus dolor egestas lectus, sit amet mattis purus

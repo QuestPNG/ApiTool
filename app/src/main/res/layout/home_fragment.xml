@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
         <variable
             name="viewModel"
             type="com.beck.apitool.MainViewModel"/>
     </data>
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -13,12 +13,21 @@
         android:padding="18dp"
         tools:context=".HomeFragment">
 
+        <Spinner
+            android:id="@+id/method_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginBottom="8dp"/>
+
         <LinearLayout
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:orientation="horizontal"
             android:id="@+id/url_row"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/method_spinner"
+            app:layout_constraintStart_toStartOf="parent"
             android:gravity="center_horizontal">
             <TextView
                 android:id="@+id/url_prompt"
@@ -30,6 +39,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"/>
             <EditText
+                android:id="@+id/url_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -37,13 +47,14 @@
                 android:layout_marginHorizontal="8dp"
                 android:paddingHorizontal="4dp"
                 android:paddingVertical="4dp"
-                android:inputType="text"
+                android:inputType="textUri"
                 android:hint="@string/url_hint"
                 android:text="@={viewModel.url}"
                 android:textSize="20sp"
                 app:layout_constraintTop_toTopOf="@id/url_prompt"
                 app:layout_constraintStart_toEndOf="@id/url_prompt"
-                app:layout_constraintBottom_toBottomOf="@id/url_prompt"/>
+                app:layout_constraintBottom_toBottomOf="@id/url_prompt"
+                android:autofillHints="none" />
         </LinearLayout>
         <TextView
             android:id="@+id/body_prompt"
@@ -54,10 +65,12 @@
             app:layout_constraintTop_toBottomOf="@id/url_row"
             android:text="@string/body_prompt"/>
         <EditText
+            android:id="@+id/body_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="80dp"
+            android:minHeight="64dp"
             android:padding="8dp"
+            android:textSize="16sp"
             style="@style/EditTextStyle"
             app:layout_constraintTop_toBottomOf="@id/body_prompt"
             android:autofillHints=""
@@ -65,10 +78,11 @@
             android:text="@={viewModel.request_body}"/>
 
         <TextView
+            android:id="@+id/response_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/response_view"
+            app:layout_constraintTop_toBottomOf="@id/body_input"
             android:paddingBottom="4dp"
             android:text="@string/response_prompt"
             android:textSize="24sp"/>
@@ -76,11 +90,19 @@
             android:id="@+id/response_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/response_label"
             android:textSize="16sp"
             style="@style/EditTextStyle"
-            android:text="@={viewModel.responseView}"
+            android:text="@{viewModel.responseView}"
             android:padding="8dp"
             android:layout_marginBottom="16dp"/>
+        <Button
+            android:id="@+id/send_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/response_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text="@string/send_button"
+            android:textSize="20sp"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

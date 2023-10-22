@@ -37,10 +37,17 @@ android {
         viewBinding = true
         dataBinding = true
     }
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/INDEX.LIST"
+        }
+    }
 }
 
 dependencies {
     val ktorVersion = "2.3.5"
+    val logback_version = "1.3.11"
 
     // Kotlin
     implementation("androidx.core:core-ktx:1.9.0")
@@ -59,6 +66,8 @@ dependencies {
 
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
+    implementation("io.ktor:ktor-client-logging:$ktorVersion")
+    implementation("ch.qos.logback:logback-classic:$logback_version")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")

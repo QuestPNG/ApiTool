@@ -4,14 +4,15 @@
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
 
-        <item name="colorPrimary">@color/yellow</item>
-        <item name="colorPrimaryDark">@color/peach</item>
-        <item name="colorAccent">@color/green</item>
+        <item name="colorPrimary">@color/lavender</item>
+        <item name="colorPrimaryDark">@color/blue</item>
+        <item name="colorAccent">@color/peach</item>
 
         <item name="colorSurface">@color/crust</item>
         <item name="android:colorBackground">@color/mantle</item>
         <item name="colorSurfaceContainer">@color/mantle</item>
 
+        <item name="colorOnPrimary">@color/mantle</item>
         <item name="colorOnSurface">@color/text</item>
 
         <!--<item name="editTextStyle">@style/EditTextStyle</item>-->
