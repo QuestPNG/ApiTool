@@ -54,7 +54,6 @@ public class HomeFragment extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         viewModel.isLoading().observe(getViewLifecycleOwner(), statusObserver);
 
         sendButton.setOnClickListener(new View.OnClickListener() {

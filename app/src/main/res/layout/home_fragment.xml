@@ -55,8 +55,9 @@
                 app:layout_constraintStart_toEndOf="@id/url_prompt"
                 app:layout_constraintBottom_toBottomOf="@id/url_prompt"
                 android:autofillHints="none" />
+
         </LinearLayout>
-        <TextView
+        <!--<TextView
             android:id="@+id/body_prompt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -75,14 +76,14 @@
             app:layout_constraintTop_toBottomOf="@id/body_prompt"
             android:autofillHints=""
             android:inputType="textMultiLine"
-            android:text="@={viewModel.request_body}"/>
+            android:text="@={viewModel.requestBody}"/>-->
 
         <TextView
             android:id="@+id/response_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/body_input"
+            app:layout_constraintTop_toBottomOf="@id/compose_grid_fragment"
             android:paddingBottom="4dp"
             android:text="@string/response_prompt"
             android:textSize="24sp"/>
@@ -96,6 +97,13 @@
             android:text="@{viewModel.responseView}"
             android:padding="8dp"
             android:layout_marginBottom="16dp"/>
+        <fragment
+            android:id="@+id/compose_grid_fragment"
+            android:name="com.beck.apitool.GridFragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/url_row"
+            app:layout_constraintStart_toStartOf="parent"/>
         <Button
             android:id="@+id/send_button"
             android:layout_width="wrap_content"
