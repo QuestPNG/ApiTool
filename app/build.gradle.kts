@@ -52,6 +52,7 @@ android {
 dependencies {
     val ktorVersion = "2.3.5"
     val logback_version = "1.3.11"
+    val nav_version = "2.6.0"
 
     // Kotlin
     implementation("androidx.core:core-ktx:1.9.0")
@@ -69,6 +70,8 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
+
+    implementation("androidx.navigation:navigation-compose:$nav_version")
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
 
     implementation("androidx.appcompat:appcompat:1.6.1")
@@ -86,6 +89,8 @@ dependencies {
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
     implementation("io.ktor:ktor-client-logging:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
     implementation("ch.qos.logback:logback-classic:$logback_version")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")

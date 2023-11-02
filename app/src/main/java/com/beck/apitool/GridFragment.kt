@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.beck.apitool.databinding.ComposeGridFragmentBinding
 import com.beck.apitool.ui.common.tabButtonColors
@@ -56,7 +57,8 @@ public class GridFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        val viewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        //val viewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        val viewModel: MainViewModel by activityViewModels()
         _binding = ComposeGridFragmentBinding.inflate(inflater, container, false)
         val view = binding.root
         binding.composeGrid.apply {
@@ -68,6 +70,7 @@ public class GridFragment: Fragment() {
                         modifier = Modifier.padding(vertical=4.dp)
                     ) {
                         InputTabBar(modifier = Modifier.padding(bottom=4.dp), currentView = currentView.value, onInputViewChange = viewModel::setCurrentView)
+                        val bodyState = viewModel.bodyState.collectAsState()
                         when (currentView.value) {
                             InputView.HEADERS -> ComposeGrid(
                                 viewModel = viewModel,
@@ -86,8 +89,8 @@ public class GridFragment: Fragment() {
                             InputView.BODY -> OutlinedTextField(
                                 modifier = Modifier.fillMaxWidth(),
                                 colors = gridTextFieldColors(),
-                                value = "Foo",
-                                onValueChange = {}
+                                value = bodyState.value,
+                                onValueChange = viewModel::setBody
                             )
                         }
                     }
@@ -206,6 +209,7 @@ fun GridRow(
             OutlinedTextField(
                 modifier = Modifier
                     .weight(1f),
+                singleLine = true,
                 //.padding(horizontal = 2.dp),
                 colors = gridTextFieldColors(),
                 //shape = RectangleShape,
@@ -215,6 +219,7 @@ fun GridRow(
             OutlinedTextField(
                 modifier = Modifier
                     .weight(1f),
+                singleLine = true,
                 //.padding(horizontal = 2.dp),
                 colors = gridTextFieldColors(),
                 //shape = RectangleShape,
