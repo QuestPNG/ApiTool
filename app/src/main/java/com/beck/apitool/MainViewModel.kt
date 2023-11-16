@@ -1,5 +1,10 @@
 package com.beck.apitool
 
+import android.graphics.Color
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -23,21 +28,6 @@ enum class LoadingStatus {
     LOADING,
     DONE
 }
-/*
-data class GridRow(
-    url: String,
-    key: String,
-    Value: String
-
-)
-
-
-val gridItems: List<MutableStateFlows<GridRows>>
-
-onGridRowChange(index: Int) {
-    gridItems[index].value =
-}
- */
 
 enum class InputView {
     HEADERS,
@@ -52,6 +42,14 @@ enum class HTTPMethod {
     DELETE
 }
 
+enum class ResponseStatus {
+    SUCCESS,
+    ERROR
+}
+data class ResponseState (
+    val status: ResponseStatus,
+    val message: String
+)
 data class GridRowState (
     val key: String,
     val value: String,
@@ -62,12 +60,12 @@ class MainViewModel: ViewModel() {
         install(ContentNegotiation) {
             json()
         }
-        //TODO: Install ContentNegotiation plugin
     }
 
     val url = MutableLiveData<String>()
     val requestBody = MutableLiveData<String>()
     val responseView = MutableLiveData<String>()
+    //val responseView = MutableLiveData<ResponseState>()
 
     private val _currentView = MutableStateFlow(InputView.BODY)
     val currentView = _currentView.asStateFlow()
@@ -76,7 +74,6 @@ class MainViewModel: ViewModel() {
 
     val headerState = mutableStateListOf<GridRowState>(GridRowState("Content-Type", "application/json"))
     val queryState = mutableStateListOf<GridRowState>(GridRowState("", ""))
-    val gridState = mutableStateListOf<GridRowState>(GridRowState("", ""))
 
     private val _bodyState = MutableStateFlow("")
     val bodyState = _bodyState.asStateFlow()
@@ -89,13 +86,15 @@ class MainViewModel: ViewModel() {
             isLoading.value = true
             try {
                 val response = client.request(requestUrl) {
-                    method = when(spinnerState.value) {
-                        0 -> HttpMethod.Get
-                        1 -> HttpMethod.Post
-                        2 -> HttpMethod.Put
-                        3 -> HttpMethod.Delete
-                        else -> HttpMethod.Get
-                    }
+                    //method = when(spinnerState.value) {
+                    //    0 -> HttpMethod.Get
+                    //    1 -> HttpMethod.Post
+                    //    2 -> HttpMethod.Put
+                    //    3 -> HttpMethod.Delete
+                    //    else -> HttpMethod.Get
+                    //}
+                    method = HttpMethod.DefaultMethods[spinnerState.value ?: 0]
+                    Log.d("MainViewModel.httpRequest()", "Http Method: $method")
                     accept(io.ktor.http.ContentType.Any)
                     url {
                         for (header in headerState) {
@@ -114,7 +113,9 @@ class MainViewModel: ViewModel() {
                 responseView.value = response.body()
             } catch (e: Exception) {
                // TODO: Make toast
-                responseView.value = e.stackTraceToString()
+                val spannable = SpannableStringBuilder("Error: ${e.message}")
+                spannable.setSpan(Color.RED, 0, 5, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+                responseView.value = e.message
             }
         }
         isLoading.value = false
@@ -125,9 +126,6 @@ class MainViewModel: ViewModel() {
     }
     fun setCurrentView(view: InputView) {
         _currentView.value = view
-    }
-    fun addGridRow() {
-        gridState.add(GridRowState("", ""))
     }
     fun onHeaderChange(index: Int, key: String?, value: String?) {
         val content = headerState[index]
@@ -150,12 +148,6 @@ class MainViewModel: ViewModel() {
     }
     fun removeQuery(index: Int) {
         queryState.removeAt(index)
-    }
-    fun onGridInput(index: Int, key: String?, value: String?) {
-        val content = gridState[index]
-        val newContent = GridRowState(key ?: content.key, value?: content.value)
-        gridState[index] = newContent
-        //state = GridRowState(key = key ?: state.value.key, value ?: state.value.value)
     }
 
 }

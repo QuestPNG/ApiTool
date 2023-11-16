@@ -19,7 +19,10 @@
         <item>Get</item>
         <item>Post</item>
         <item>Put</item>
+        <item>Patch</item>
         <item>Delete</item>
+        <item>Head</item>
+        <item>Options</item>
     </string-array>
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
