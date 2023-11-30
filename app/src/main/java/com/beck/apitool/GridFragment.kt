@@ -6,8 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -33,6 +37,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -166,13 +171,20 @@ fun InputTabBar(
         //horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         Button(
+            modifier = Modifier.weight(1f),
             onClick = { onInputViewChange(InputView.HEADERS) },
             shape = RoundedCornerShape(8.dp, 8.dp, 0.dp, 0.dp),
-            colors = tabButtonColors(highlighted = currentView == InputView.HEADERS)
+            colors = tabButtonColors(highlighted = currentView == InputView.HEADERS),
+            contentPadding = PaddingValues(1.dp)
         ) {
-            Text("Headers")
+            Text(
+                "Headers",
+                overflow = TextOverflow.Clip,
+                maxLines = 1
+            )
         }
         Button(
+            modifier = Modifier.weight(1f),
             onClick = { onInputViewChange(InputView.QUERY) },
             shape = RoundedCornerShape(8.dp, 8.dp, 0.dp, 0.dp),
             colors = tabButtonColors(highlighted = currentView == InputView.QUERY)
@@ -180,11 +192,25 @@ fun InputTabBar(
             Text("Query")
         }
         Button(
+            modifier = Modifier.weight(1f),
             onClick = { onInputViewChange(InputView.BODY) },
             shape = RoundedCornerShape(8.dp, 8.dp, 0.dp, 0.dp),
             colors = tabButtonColors(highlighted = currentView == InputView.BODY)
         ) {
             Text("Body")
+        }
+        Box(
+            modifier = Modifier.weight(0.6f),
+            contentAlignment = Alignment.CenterEnd
+        ){
+            if(currentView == InputView.BODY) {
+                IconButton(
+                    //modifier = Modifier.weight(0.5f),
+                    onClick = {}
+                ) {
+                    Icon(Icons.Default.MoreVert, contentDescription = "Body Options")
+                }
+            }
         }
     }
 }
