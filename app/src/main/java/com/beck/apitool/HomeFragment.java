@@ -1,6 +1,7 @@
 package com.beck.apitool;
 
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -20,8 +22,10 @@ public class HomeFragment extends Fragment {
     private HomeFragmentBinding binding;
     private MainViewModel viewModel;
     private EditText urlInput;
+    private TextView responseView;
     private Observer<Boolean> statusObserver;
     private Button sendButton;
+    private Spinner methodSpinner;
 
     @Override
     public View onCreateView(
@@ -29,11 +33,13 @@ public class HomeFragment extends Fragment {
     ) {
         binding = HomeFragmentBinding.inflate(inflater, container, false);
         binding.setLifecycleOwner(this);
-        viewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
         binding.setViewModel(viewModel);
 
         sendButton = binding.sendButton;
         urlInput = binding.urlInput;
+        methodSpinner = binding.methodSpinner;
+        responseView = binding.responseView;
 
         statusObserver = status -> {
             sendButton.setEnabled(!status);
@@ -48,6 +54,8 @@ public class HomeFragment extends Fragment {
         );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
+
+        responseView.setMovementMethod(new ScrollingMovementMethod());
 
         return binding.getRoot();
     }

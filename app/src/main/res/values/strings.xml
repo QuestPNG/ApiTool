@@ -18,6 +18,8 @@
     <string-array name="method_array">
         <item>Get</item>
         <item>Post</item>
+        <item>Put</item>
+        <item>Delete</item>
     </string-array>
 
     <string name="ws_connect">Connect</string>

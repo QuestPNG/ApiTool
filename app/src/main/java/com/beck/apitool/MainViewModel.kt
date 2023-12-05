@@ -1,8 +1,7 @@
 package com.beck.apitool
 
 import android.util.Log
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,12 +9,15 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.logging.Logging
-import io.ktor.client.request.get
-import io.ktor.util.logging.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import okhttp3.internal.toImmutableList
 import androidx.compose.runtime.mutableStateListOf
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.accept
+import io.ktor.client.request.request
+import io.ktor.client.request.setBody
+import io.ktor.http.HttpMethod
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.flow.asStateFlow
 
 enum class LoadingStatus {
@@ -44,10 +46,12 @@ enum class InputView {
     BODY
 }
 
-enum class HTTPMethod {
+/*enum class HTTPMethod {
     GET,
     POST,
-}
+    PUT,
+    DELETE
+}*/
 
 data class GridRowState (
     val key: String,
@@ -56,37 +60,94 @@ data class GridRowState (
 class MainViewModel: ViewModel() {
     private val client = HttpClient(OkHttp) {
         install(Logging)
+        install(ContentNegotiation) {
+            json()
+        }
+        //TODO: Install ContentNegotiation plugin
     }
 
     val url = MutableLiveData<String>()
+
+    private val _composeUrl = MutableStateFlow("")
+    val composeUrl = _composeUrl.asStateFlow()
+
     val requestBody = MutableLiveData<String>()
     val responseView = MutableLiveData<String>()
+
+    private val _composeResponseView = MutableStateFlow("")
+    val composeResponseView = _composeResponseView.asStateFlow()
 
     private val _currentView = MutableStateFlow(InputView.BODY)
     val currentView = _currentView.asStateFlow()
 
     val isLoading = MutableLiveData(false)
 
-    val headerState = mutableStateListOf<GridRowState>(GridRowState("", ""))
+    private val _currentMethod = MutableStateFlow(HttpMethod.Get)
+    val currentMethod = _currentMethod.asStateFlow()
+
+    val headerState = mutableStateListOf<GridRowState>(GridRowState("Content-Type", "application/json"))
     val queryState = mutableStateListOf<GridRowState>(GridRowState("", ""))
     val gridState = mutableStateListOf<GridRowState>(GridRowState("", ""))
 
-    fun httpRequest(protocol: String) {
-        val requestUrl = url.value ?: ""
+    private val _bodyState = MutableStateFlow("")
+    val bodyState = _bodyState.asStateFlow()
+
+    val spinnerState = MutableLiveData<Int>()
+
+    fun httpRequest(protocol: String?) {
+        //val requestUrl = url.value ?: ""
+        val requestUrl = composeUrl.value ?: ""
         viewModelScope.launch {
-            Log.d("MainViewModel", "Http Request: $requestUrl")
             isLoading.value = true
             try {
-                val response = client.get(requestUrl)
-                responseView.value = response.body()
+                val response = client.request(requestUrl) {
+                    /*method = when(spinnerState.value) {
+                        0 -> HttpMethod.Get
+                        1 -> HttpMethod.Post
+                        2 -> HttpMethod.Put
+                        3 -> HttpMethod.Delete
+                        else -> HttpMethod.Get
+                    }*/
+                    method = _currentMethod.value
+                    accept(io.ktor.http.ContentType.Any)
+                    url {
+                        for (header in headerState) {
+                            if(header.key != "" && header.value != "") {
+                                headers.append(header.key, header.value)
+                            }
+                        }
+                        for (param in queryState) {
+                            if(param.key != "" && param.value != "") {
+                                parameters.append(param.key, param.value)
+                            }
+                        }
+                    }
+                    setBody(bodyState.value)
+                }
+                _composeResponseView.value = response.body()
+                //responseView.value = response.body()
             } catch (e: Exception) {
                // TODO: Make toast
-                responseView.value = ""
+                //responseView.value = e.stackTraceToString()
+                _composeResponseView.value = e.stackTraceToString()
             }
         }
         isLoading.value = false
     }
 
+    fun setHttpMethod(method: HttpMethod) {
+        _currentMethod.value = method
+    }
+    fun setUrl(url: String) {
+        _composeUrl.value = url
+    }
+
+    fun setResponse(response: String) {
+        _composeResponseView.value = response
+    }
+    fun setBody(body: String) {
+       _bodyState.value = body
+    }
     fun setCurrentView(view: InputView) {
         _currentView.value = view
     }
