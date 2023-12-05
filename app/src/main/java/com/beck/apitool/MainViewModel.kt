@@ -1,6 +1,7 @@
 package com.beck.apitool
 
 import android.util.Log
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -45,12 +46,12 @@ enum class InputView {
     BODY
 }
 
-enum class HTTPMethod {
+/*enum class HTTPMethod {
     GET,
     POST,
     PUT,
     DELETE
-}
+}*/
 
 data class GridRowState (
     val key: String,
@@ -66,13 +67,23 @@ class MainViewModel: ViewModel() {
     }
 
     val url = MutableLiveData<String>()
+
+    private val _composeUrl = MutableStateFlow("")
+    val composeUrl = _composeUrl.asStateFlow()
+
     val requestBody = MutableLiveData<String>()
     val responseView = MutableLiveData<String>()
+
+    private val _composeResponseView = MutableStateFlow("")
+    val composeResponseView = _composeResponseView.asStateFlow()
 
     private val _currentView = MutableStateFlow(InputView.BODY)
     val currentView = _currentView.asStateFlow()
 
     val isLoading = MutableLiveData(false)
+
+    private val _currentMethod = MutableStateFlow(HttpMethod.Get)
+    val currentMethod = _currentMethod.asStateFlow()
 
     val headerState = mutableStateListOf<GridRowState>(GridRowState("Content-Type", "application/json"))
     val queryState = mutableStateListOf<GridRowState>(GridRowState("", ""))
@@ -83,19 +94,21 @@ class MainViewModel: ViewModel() {
 
     val spinnerState = MutableLiveData<Int>()
 
-    fun httpRequest(protocol: String) {
-        val requestUrl = url.value ?: ""
+    fun httpRequest(protocol: String?) {
+        //val requestUrl = url.value ?: ""
+        val requestUrl = composeUrl.value ?: ""
         viewModelScope.launch {
             isLoading.value = true
             try {
                 val response = client.request(requestUrl) {
-                    method = when(spinnerState.value) {
+                    /*method = when(spinnerState.value) {
                         0 -> HttpMethod.Get
                         1 -> HttpMethod.Post
                         2 -> HttpMethod.Put
                         3 -> HttpMethod.Delete
                         else -> HttpMethod.Get
-                    }
+                    }*/
+                    method = _currentMethod.value
                     accept(io.ktor.http.ContentType.Any)
                     url {
                         for (header in headerState) {
@@ -111,15 +124,27 @@ class MainViewModel: ViewModel() {
                     }
                     setBody(bodyState.value)
                 }
-                responseView.value = response.body()
+                _composeResponseView.value = response.body()
+                //responseView.value = response.body()
             } catch (e: Exception) {
                // TODO: Make toast
-                responseView.value = e.stackTraceToString()
+                //responseView.value = e.stackTraceToString()
+                _composeResponseView.value = e.stackTraceToString()
             }
         }
         isLoading.value = false
     }
 
+    fun setHttpMethod(method: HttpMethod) {
+        _currentMethod.value = method
+    }
+    fun setUrl(url: String) {
+        _composeUrl.value = url
+    }
+
+    fun setResponse(response: String) {
+        _composeResponseView.value = response
+    }
     fun setBody(body: String) {
        _bodyState.value = body
     }
