@@ -13,12 +13,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.mutableStateListOf
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.accept
 import io.ktor.client.request.request
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpMethod
 import io.ktor.serialization.kotlinx.json.json
+import io.ktor.websocket.Frame
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.runBlocking
 
 enum class LoadingStatus {
     LOADING,
@@ -64,6 +67,10 @@ class MainViewModel: ViewModel() {
             json()
         }
         //TODO: Install ContentNegotiation plugin
+    }
+
+    private val wsClient = HttpClient(OkHttp) {
+        install(WebSockets)
     }
 
     val url = MutableLiveData<String>()
@@ -135,6 +142,25 @@ class MainViewModel: ViewModel() {
         isLoading.value = false
     }
 
+    fun openConnection(url:String){
+        runBlocking{
+            val wsRequest = "" // get viewmodel variable
+            val message = "" //get viewmodel variable
+            wsClient.webSocket(wsRequest){
+                //get on open message
+                while(true){
+                    val serverMessage=incoming.receive()as?Frame.Text
+                    //append to resopnse box tag incoming
+                    val clientMessage= Frame.Text(message)
+                    if(clientMessage!=null){
+                        outgoing.send(clientMessage)
+                        //append to response box tag outgoing
+                    }
+                } // get on close messag e
+            }
+        }
+        client.close()
+    }
     fun setHttpMethod(method: HttpMethod) {
         _currentMethod.value = method
     }
