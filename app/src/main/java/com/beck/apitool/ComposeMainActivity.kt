@@ -4,10 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.beck.apitool.ui.screens.HttpScreen
+import com.beck.apitool.ui.screens.SessionListScreen
+import com.beck.apitool.ui.screens.mockSessionList
 import com.beck.apitool.ui.theme.ApiToolTheme
 
 class ComposeMainActivity : ComponentActivity() {
@@ -20,7 +23,11 @@ class ComposeMainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    HttpScreen()
+                    BottomAppBar {
+
+                    }
+                    // HttpScreen()
+                    SessionListScreen(sessions = mockSessionList)
                 }
             }
         }

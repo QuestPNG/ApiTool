@@ -134,7 +134,6 @@ class MainViewModel: ViewModel() {
         }
         isLoading.value = false
     }
-
     fun setHttpMethod(method: HttpMethod) {
         _currentMethod.value = method
     }
