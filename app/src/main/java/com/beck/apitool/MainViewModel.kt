@@ -22,11 +22,13 @@ import io.ktor.serialization.kotlinx.json.json
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
@@ -88,6 +90,7 @@ class MainViewModel: ViewModel() {
     }
 
     private val wsClient = HttpClient(OkHttp) {
+        install(Logging)
         install(WebSockets)
     }
 
@@ -165,23 +168,26 @@ class MainViewModel: ViewModel() {
     fun openConnection(){
         viewModelScope.launch{
             val wsRequest = _composeUrl.value // get viewmodel variable
-
             try {
                 val session = wsClient.webSocketSession(wsRequest) {
-
                 }
                 session.incoming
                         .consumeAsFlow()
-                        //.filterIsInstance<Frame.Text>()
-                        //.mapNotNull{
+                        .filterIsInstance<Frame.Text>()
+                        .map { (it.readText()) }
                         .onEach {
-                            Log.d("incoming", it.toString())
-                            _composeResponseView.value = it.toString()
+                            Log.d("incoming", it)
+                            _composeResponseView.value = it
                         }
                         .catch {
-                            session.close()
                             Log.e("viewModel.openConnection", it.stackTraceToString())
+                            session.close()
                             //TODO make toast or response codes
+                        }
+                        .collect{
+                            _composeResponseView.value = it
+                            val message = wsMessage(wsMessageType.INCOMING, it)
+                            webSocketResponseView.add(message)
                         }
                 session.incoming.receive()
             } catch(e: Exception){
@@ -189,6 +195,7 @@ class MainViewModel: ViewModel() {
             }
         }
     }
+
     fun setHttpMethod(method: HttpMethod) {
         _currentMethod.value = method
     }
