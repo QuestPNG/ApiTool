@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
+import com.beck.apitool.MainViewModel
 
 // val mockSessionList = listOf("mySession", "theSeissoin", "alsdkfj")
 val mockSession = Session(
@@ -66,10 +67,11 @@ data class BorderStroke(val width: Dp, val brush: Brush)
 @Composable
 fun SessionListScreen(
     modifier: Modifier = Modifier,
-    sessions: List<Session>,
+    viewModel: MainViewModel
 ) {
     var showWebSockets by remember { mutableStateOf(true) }
 
+    val sessions = viewModel.savedSessions
     Box(
         modifier = modifier.fillMaxSize()
     ) {
@@ -177,6 +179,7 @@ fun SessionListScreen(
         }
     }
 }
+/*
 @Preview(showSystemUi = true)
 @Composable
 fun SessionListScreenPreview() {
@@ -184,3 +187,4 @@ fun SessionListScreenPreview() {
         SessionListScreen(sessions = mockSessionList)
     }
 }
+ */

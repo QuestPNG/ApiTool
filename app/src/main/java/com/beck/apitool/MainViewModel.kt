@@ -12,7 +12,12 @@ import io.ktor.client.plugins.logging.Logging
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.mutableStateListOf
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.beck.apitool.Databases_Room.Database
+import com.beck.apitool.Databases_Room.Session
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.accept
@@ -82,7 +87,7 @@ data class GridRowState (
     val key: String,
     val value: String,
 )
-class MainViewModel: ViewModel() {
+class MainViewModel(private val db: Database): ViewModel() {
     private val client = HttpClient(OkHttp) {
         install(Logging)
         install(ContentNegotiation) {
@@ -126,6 +131,7 @@ class MainViewModel: ViewModel() {
     private val _bodyState = MutableStateFlow("")
     val bodyState = _bodyState.asStateFlow()
 
+     val savedSessions = mutableStateListOf<Session>()
     val spinnerState = MutableLiveData<Int>()
 
     fun httpRequest(protocol: String?) {
@@ -215,6 +221,12 @@ class MainViewModel: ViewModel() {
             }
         }
     }
+
+    fun getSavedSessions() {
+        viewModelScope.launch {
+            savedSessions.addAll(db.sessionDao().getAll())
+        }
+    }
     fun sendWsMessage(){
         viewModelScope.launch {
             wsMessageFlow.emit(bodyState.value)
@@ -269,4 +281,17 @@ class MainViewModel: ViewModel() {
         //state = GridRowState(key = key ?: state.value.key, value ?: state.value.value)
     }
 
+    //val Factory: ViewModelProvider.Factory = object: ViewModelProvider.Factory {
+    //    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+    //        return MainViewModel(
+
+    //        )
+    //    }
+    //}
+}
+
+@Suppress("UNCHECKED_CAST")
+class MainViewModelFactory(private val db: Database): ViewModelProvider.Factory {
+
+    override fun <T : ViewModel> create(modelClass: Class<T>): T = MainViewModel(db) as T
 }

@@ -9,20 +9,20 @@ import androidx.room.Update
 @Dao
 interface SessionDao {
     @Query ("SELECT *  FROM session")
-    fun getAll(): List<Session>
+    suspend fun getAll(): List<Session>
 
     @Insert
-    fun insertAll(vararg sessions: Session)
+    suspend fun insertAll(vararg sessions: Session)
 
     @Delete
-    fun delete(user: Session)
+    suspend fun delete(user: Session)
 
     @Query("SELECT * FROM session WHERE title = :title")
-    fun findByTitle(title: String): Session?
+    suspend fun findByTitle(title: String): Session?
 
     @Insert
-    fun create(title: String, data: String)
+    suspend fun create(session: Session)
 
     @Update
-    fun updateSession(vararg sessions: Session)
+    suspend fun updateSession(vararg sessions: Session)
 }

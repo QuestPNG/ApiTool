@@ -13,8 +13,10 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -40,29 +42,27 @@ import io.ktor.http.HttpMethod
 @Composable
 fun HttpScreen(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel = MainViewModel()
+    viewModel: MainViewModel
 ) {
     val url = viewModel.composeUrl.collectAsState()
     Box(modifier = modifier
-        .padding(vertical = 8.dp)
-        .fillMaxSize()
-        ) {
+        .fillMaxWidth()
+    ) {
         ConstraintLayout(
-            modifier = Modifier.padding(8.dp)
-        ){
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
+        ) {
+            val urlLabel = createRef()
             val methodDropdown = createRef()
-            val (urlLabel, urlInput) = createRefs()
+            //val (urlLabel, urlInput) = createRefs()
             val requestGrid = createRef()
             val (responseLabel, response) = createRefs()
             val sendButton = createRef()
 
             Box(
-                modifier = Modifier
-                    .constrainAs(methodDropdown) {
-                        top.linkTo(parent.top, margin = 8.dp)
-                        start.linkTo(parent.start, margin = 8.dp)
-                        //end.linkTo(parent.end, margin = 8.dp)
-                    }
+                modifier = Modifier.constrainAs(methodDropdown) {
+                    top.linkTo(parent.top, margin = 8.dp)
+                    start.linkTo(parent.start)
+                }
             ) {
                 var expanded by remember { mutableStateOf(false) }
                 val currentMethod = viewModel.currentMethod.collectAsState()
@@ -71,13 +71,14 @@ fun HttpScreen(
                     contentPadding = PaddingValues(4.dp),
                     shape = RoundedCornerShape(4.dp)
                 ) {
-                    Text(text = when(currentMethod.value) {
-                        HttpMethod.Get -> "GET"
-                        HttpMethod.Post -> "POST"
-                        HttpMethod.Put -> "PUT"
-                        HttpMethod.Delete -> "DELETE"
-                        else -> "GET"
-                    }, fontSize = 20.sp
+                    Text(
+                        text = when (currentMethod.value) {
+                            HttpMethod.Get -> "GET"
+                            HttpMethod.Post -> "POST"
+                            HttpMethod.Put -> "PUT"
+                            HttpMethod.Delete -> "DELETE"
+                            else -> "GET"
+                        }, fontSize = 20.sp
                     )
                 }
                 DropdownMenu(
@@ -85,28 +86,28 @@ fun HttpScreen(
                     onDismissRequest = { expanded = false },
                 ) {
                     DropdownMenuItem(
-                        text = { Text(text="GET") },
+                        text = { Text(text = "GET") },
                         onClick = {
                             viewModel.setHttpMethod(HttpMethod.Get)
                             expanded = false
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text(text="POST") },
+                        text = { Text(text = "POST") },
                         onClick = {
                             viewModel.setHttpMethod(HttpMethod.Post)
                             expanded = false
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text(text="PUT") },
+                        text = { Text(text = "PUT") },
                         onClick = {
                             viewModel.setHttpMethod(HttpMethod.Put)
                             expanded = false
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text(text="DELETE") },
+                        text = { Text(text = "DELETE") },
                         onClick = {
                             viewModel.setHttpMethod(HttpMethod.Delete)
                             expanded = false
@@ -114,12 +115,13 @@ fun HttpScreen(
                     )
                 }
             }
-            Row(
-                modifier.constrainAs(urlLabel) {
-                    top.linkTo(methodDropdown.bottom, margin = 16.dp)
-                    start.linkTo(parent.start, margin = 8.dp)
+            Column(
+                modifier = Modifier.constrainAs(urlLabel) {
+                    top.linkTo(methodDropdown.bottom, margin = 8.dp)
+                    //start.linkTo(parent.start, margin = 8.dp)
                 }.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                horizontalAlignment = Alignment.Start
+                //verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     //modifier = Modifier.constrainAs(urlLabel) {
@@ -135,7 +137,7 @@ fun HttpScreen(
                     //    bottom.linkTo(urlLabel.bottom)
                     //    start.linkTo(urlLabel.end, margin = 8.dp)
                     //},
-                    modifier = Modifier.fillMaxWidth().padding(start=8.dp, end=16.dp),
+                    modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
                     value = url.value,
                     onValueChange = viewModel::setUrl,
                     singleLine = true,
@@ -155,7 +157,7 @@ fun HttpScreen(
             ) {
                 val currentView = viewModel.currentView.collectAsState()
                 InputTabBar(
-                    modifier = Modifier.padding(bottom=4.dp),
+                    modifier = Modifier.padding(bottom = 4.dp),
                     currentView = currentView.value,
                     onInputViewChange = viewModel::setCurrentView
                 )
@@ -168,6 +170,7 @@ fun HttpScreen(
                         onDelete = viewModel::removeHeader,
                         onAdd = viewModel::addHeader
                     )
+
                     InputView.QUERY -> ComposeGrid(
                         viewModel = viewModel,
                         content = viewModel.queryState,
@@ -175,6 +178,7 @@ fun HttpScreen(
                         onDelete = viewModel::removeQuery,
                         onAdd = viewModel::addQuery
                     )
+
                     InputView.BODY -> OutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         colors = gridTextFieldColors(),
@@ -192,7 +196,8 @@ fun HttpScreen(
                     end.linkTo(parent.end)
                 }
             ) {
-                Text("Send Request",
+                Text(
+                    "Send Request",
                     fontSize = 16.sp
                 )
             }
@@ -220,10 +225,19 @@ fun HttpScreen(
     }
 }
 
+/*
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showSystemUi = true)
 @Composable
 fun HttpPreview() {
     ApiToolTheme {
-        HttpScreen()
+        Scaffold(
+            topBar = {
+                TopAppBar(title = { Text("ApiTool") })
+            }
+        ) {
+            HttpScreen(modifier = Modifier.padding(it), viewModel = MainViewModel())
+        }
     }
 }
+ */

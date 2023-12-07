@@ -48,12 +48,13 @@ import com.beck.apitool.wsMessageType
 import androidx.compose.material3.Icon
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import com.beck.apitool.MainViewModelFactory
 import com.beck.apitool.R
 
 @Composable
 fun WsScreen(
         modifier: Modifier = Modifier,
-        viewModel: MainViewModel = MainViewModel()
+        viewModel: MainViewModel// = MainViewModel()
 ){
     val url = viewModel.composeUrl.collectAsState()
     Box(modifier = modifier
@@ -74,23 +75,23 @@ fun WsScreen(
             val sendButton = createRef()
 
             Row(
-                    modifier
-                            .fillMaxWidth()
-                            .constrainAs(urlLabel) {
-                                top.linkTo(parent.top, margin = 8.dp)
+                Modifier
+                    .fillMaxWidth()
+                    .constrainAs(urlLabel) {
+                        top.linkTo(parent.top, margin = 8.dp)
 
 
-                            },
-                    verticalAlignment = Alignment.CenterVertically
+                    },
+                verticalAlignment = Alignment.CenterVertically
             ){
                 Text(
                     text = "URL:",
                     fontSize = 24.sp
                 )
                 TextField(
-                        modifier = Modifier
+                    modifier = Modifier
 
-                                .padding(start = 8.dp, end = 16.dp),
+                        .padding(start = 8.dp, end = 16.dp),
                         value = url.value ,
                         onValueChange = viewModel::setUrl,
                         singleLine = true,
@@ -98,8 +99,7 @@ fun WsScreen(
                         placeholder = {
                             Text(text = "Enter your url...")
                         }
-                        )
-
+                )
 
             }
 
@@ -196,16 +196,16 @@ fun WsScreen(
     }
 }
 
+/*
 @Preview(showSystemUi = true)
 @Composable
 fun WsPreview(){
     ApiToolTheme {
-        WsScreen()
+        val viewModel: MainViewModel by viewModels { MainViewModelFactory() }
+        WsScreen(viewModel = MainViewModel())
     }
 }
-
-
-
+ */
 
 
 
