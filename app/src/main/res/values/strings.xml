@@ -25,6 +25,8 @@
     <string name="ws_connect">Connect</string>
     <string name="ws_url_prompt">URL:</string>
     <string name="ws_response">Response:</string>
+    <string name="incoming_desc">INCOMING</string>
+    <string name="outgoing_desc">OUTGOING</string>
 
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris

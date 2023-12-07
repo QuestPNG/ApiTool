@@ -1,9 +1,11 @@
 package com.beck.apitool.ui.screens
 
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -35,8 +37,18 @@ import com.beck.apitool.InputView
 import com.beck.apitool.MainViewModel
 import com.beck.apitool.ui.common.gridTextFieldColors
 import com.beck.apitool.ui.theme.ApiToolTheme
+import com.beck.apitool.wsMessage
 import io.ktor.client.request.request
 import io.ktor.http.HttpMethod
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
+import com.beck.apitool.ui.theme.text
+import com.beck.apitool.wsMessageType
+import androidx.compose.material3.Icon
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import com.beck.apitool.R
 
 @Composable
 fun WsScreen(
@@ -49,12 +61,17 @@ fun WsScreen(
             .fillMaxSize()
     ){
         ConstraintLayout(
-                modifier = Modifier.padding(8.dp).fillMaxWidth()
+                modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth()
         ) {
             val urlLabel = createRef()
             val responseLabel = createRef()
             val response = createRef()
             val connButton = createRef()
+            val message = createRef()
+            val messageLabel = createRef()
+            val sendButton = createRef()
 
             Row(
                     modifier
@@ -73,7 +90,7 @@ fun WsScreen(
                 TextField(
                         modifier = Modifier
 
-                                .padding(start = 8.dp),
+                                .padding(start = 8.dp, end = 16.dp),
                         value = url.value ,
                         onValueChange = viewModel::setUrl,
                         singleLine = true,
@@ -86,7 +103,8 @@ fun WsScreen(
 
             }
 
-            Button(modifier = Modifier.constrainAs(connButton){
+            Button(
+                    modifier = Modifier.constrainAs(connButton){
                     top.linkTo(urlLabel.bottom)
                     end.linkTo(parent.end)
             },
@@ -100,36 +118,83 @@ fun WsScreen(
                 )
             }
 
-            Text(modifier = Modifier.constrainAs(responseLabel) {
-                top.linkTo(connButton.bottom, margin = 8.dp)
-                start.linkTo(parent.start)
+            Row(modifier = Modifier.constrainAs(messageLabel){
+                top.linkTo(connButton.bottom)
+            }) {
+                Text(
+                        text = "Message",
+                        fontSize = 24.sp
+                )
+                Spacer(Modifier.weight(1f))
+                Button(
+                        onClick = viewModel::sendWsMessage) {
+                    Text(
+                            "Send",
+                            fontSize = 16.sp,
+                    )
+                }
+            }
+
+            val body = viewModel.bodyState.collectAsState()
+            TextField(
+                    modifier = Modifier
+                            .constrainAs(message) {
+                                top.linkTo(messageLabel.bottom)
+                                end.linkTo(parent.end)
+                            }
+                            .fillMaxWidth(),
+                    value = body.value,
+                    onValueChange = viewModel::setBody,
+                    colors = gridTextFieldColors(),
+                    placeholder = {
+                        Text(text="Compose message here...")
+                    }
+            )
+
+            Text(
+                    modifier = Modifier.constrainAs(responseLabel) {
+                    top.linkTo(message.bottom, margin = 8.dp)
+                    start.linkTo(parent.start)
             },
                     text = "Response",
                     fontSize = 24.sp,
             )
-            val responseView = viewModel.composeResponseView.collectAsState()
-            TextField(
-                    value = responseView.value,
-                    onValueChange = {},
-                    readOnly = true,
+
+            LazyColumn(
                     modifier = Modifier
-                            .fillMaxWidth()
                             .constrainAs(response) {
-                                top.linkTo(responseLabel.bottom, margin = 8.dp)
-                            },
-                    colors = gridTextFieldColors()
-            )
+                                top.linkTo(responseLabel.bottom)
+                            }
+                            .fillMaxWidth()){
+
+                items(viewModel.webSocketResponseView){
+                    if(it.type == wsMessageType.INCOMING){
+                        Column(modifier = Modifier.fillMaxWidth() , horizontalAlignment = Alignment.Start){
+                            Card(){
+                                Box(modifier = Modifier.padding(8.dp),
+                                    contentAlignment = Alignment.Center){
+                                    Text(text = it.content)
+                                }
+                            }
+                        }
+                    }else if(it.type == wsMessageType.OUTGOING){
+                        Column(modifier = Modifier.fillMaxWidth() , horizontalAlignment = Alignment.End){
+                            Card(){
+                                Box(modifier = Modifier.padding(8.dp),
+                                        contentAlignment = Alignment.Center){
+                                    Text(text = it.content)
+
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
 
         }
     }
-
-
-
-
-
-
 }
-
 
 @Preview(showSystemUi = true)
 @Composable
