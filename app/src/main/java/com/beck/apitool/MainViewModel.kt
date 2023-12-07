@@ -12,6 +12,7 @@ import io.ktor.client.plugins.logging.Logging
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.mutableStateListOf
+import androidx.lifecycle.viewmodel.compose.viewModel
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.accept
@@ -23,6 +24,7 @@ import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.consumeAsFlow
@@ -96,6 +98,7 @@ class MainViewModel: ViewModel() {
 
     val url = MutableLiveData<String>()
 
+
     private val _composeUrl = MutableStateFlow("")
     val composeUrl = _composeUrl.asStateFlow()
 
@@ -103,6 +106,7 @@ class MainViewModel: ViewModel() {
     val responseView = MutableLiveData<String>()
 
     val webSocketResponseView = mutableStateListOf<wsMessage>()
+    val wsMessageFlow = MutableSharedFlow<String>()
 
     private val _composeResponseView = MutableStateFlow("")
     val composeResponseView = _composeResponseView.asStateFlow()
@@ -170,29 +174,50 @@ class MainViewModel: ViewModel() {
             val wsRequest = _composeUrl.value // get viewmodel variable
             try {
                 val session = wsClient.webSocketSession(wsRequest) {
+
                 }
-                session.incoming
-                        .consumeAsFlow()
-                        .filterIsInstance<Frame.Text>()
-                        .map { (it.readText()) }
-                        .onEach {
-                            Log.d("incoming", it)
-                            _composeResponseView.value = it
+                viewModelScope.launch {
+                    session.incoming
+                            .consumeAsFlow()
+                            .filterIsInstance<Frame.Text>()
+                            .map { (it.readText()) }
+                            .onEach {
+                                Log.d("incoming", it)
+                                _composeResponseView.value = it
+                            }
+                            .catch {
+                                Log.e("viewModel.openConnection", it.stackTraceToString())
+                                session.close()
+                                //TODO make toast or response codes
+                            }
+                            .collect {
+                                _composeResponseView.value = it
+                                val message = wsMessage(wsMessageType.INCOMING, it)
+                                webSocketResponseView.add(message)
+                            }
+                }
+
+                viewModelScope.launch {
+                    Log.i("buttonPressed", "Starting Coroutine")
+                    wsMessageFlow.collect{
+                        try{
+                        session.outgoing.send(Frame.Text(bodyState.value))
+                        val message = wsMessage(wsMessageType.OUTGOING, it)
+                        webSocketResponseView.add(message)
+                        } catch(e: Exception){
+                            Log.e("outgoing", e.stackTraceToString())
                         }
-                        .catch {
-                            Log.e("viewModel.openConnection", it.stackTraceToString())
-                            session.close()
-                            //TODO make toast or response codes
-                        }
-                        .collect{
-                            _composeResponseView.value = it
-                            val message = wsMessage(wsMessageType.INCOMING, it)
-                            webSocketResponseView.add(message)
-                        }
-                session.incoming.receive()
+                    }
+                }
+
             } catch(e: Exception){
                 Log.e("viewModel.openConnection", e.stackTraceToString())
             }
+        }
+    }
+    fun sendWsMessage(){
+        viewModelScope.launch {
+            wsMessageFlow.emit(bodyState.value)
         }
     }
 
