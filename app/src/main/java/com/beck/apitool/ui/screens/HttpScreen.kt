@@ -192,8 +192,7 @@ fun HttpScreen(
                     end.linkTo(parent.end)
                 }
             ) {
-                Text(
-                    "Send Request",
+                Text("Send Request",
                     fontSize = 16.sp
                 )
             }

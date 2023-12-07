@@ -20,7 +20,15 @@ import io.ktor.client.request.setBody
 import io.ktor.http.HttpMethod
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.websocket.Frame
+import io.ktor.websocket.close
+import io.ktor.websocket.readText
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
 
 enum class LoadingStatus {
@@ -48,6 +56,16 @@ enum class InputView {
     QUERY,
     BODY
 }
+
+enum class wsMessageType {
+    INCOMING,
+    OUTGOING
+}
+
+data class wsMessage(
+    val type: wsMessageType,
+    val content: String
+)
 
 /*enum class HTTPMethod {
     GET,
@@ -80,6 +98,8 @@ class MainViewModel: ViewModel() {
 
     val requestBody = MutableLiveData<String>()
     val responseView = MutableLiveData<String>()
+
+    val webSocketResponseView = mutableStateListOf<wsMessage>()
 
     private val _composeResponseView = MutableStateFlow("")
     val composeResponseView = _composeResponseView.asStateFlow()
@@ -142,24 +162,32 @@ class MainViewModel: ViewModel() {
         isLoading.value = false
     }
 
-    fun openConnection(url:String){
-        runBlocking{
-            val wsRequest = "" // get viewmodel variable
-            val message = "" //get viewmodel variable
-            wsClient.webSocket(wsRequest){
-                //get on open message
-                while(true){
-                    val serverMessage=incoming.receive()as?Frame.Text
-                    //append to resopnse box tag incoming
-                    val clientMessage= Frame.Text(message)
-                    if(clientMessage!=null){
-                        outgoing.send(clientMessage)
-                        //append to response box tag outgoing
-                    }
-                } // get on close messag e
+    fun openConnection(){
+        viewModelScope.launch{
+            val wsRequest = _composeUrl.value // get viewmodel variable
+
+            try {
+                val session = wsClient.webSocketSession(wsRequest) {
+
+                }
+                session.incoming
+                        .consumeAsFlow()
+                        //.filterIsInstance<Frame.Text>()
+                        //.mapNotNull{
+                        .onEach {
+                            Log.d("incoming", it.toString())
+                            _composeResponseView.value = it.toString()
+                        }
+                        .catch {
+                            session.close()
+                            Log.e("viewModel.openConnection", it.stackTraceToString())
+                            //TODO make toast or response codes
+                        }
+                session.incoming.receive()
+            } catch(e: Exception){
+                Log.e("viewModel.openConnection", e.stackTraceToString())
             }
         }
-        client.close()
     }
     fun setHttpMethod(method: HttpMethod) {
         _currentMethod.value = method

@@ -8,6 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.beck.apitool.ui.screens.HttpScreen
+import com.beck.apitool.ui.screens.WsScreen
 import com.beck.apitool.ui.theme.ApiToolTheme
 
 class ComposeMainActivity : ComponentActivity() {
@@ -20,7 +21,8 @@ class ComposeMainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    HttpScreen()
+                    //HttpScreen()
+                    WsScreen()
                 }
             }
         }
