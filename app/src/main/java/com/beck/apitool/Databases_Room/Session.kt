@@ -6,11 +6,9 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Session (
-
-    @PrimaryKey(autoGenerate = true)
-    val isWebsocketSession: Boolean,
-    val id: Long = 0,
+    @PrimaryKey
     val title: String,
+    val isWebsocketSession: Boolean,
     val url: String,
     val headers: String,
     val queryParams: String,

@@ -2,6 +2,7 @@ package com.beck.apitool.ui.common
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -26,18 +27,22 @@ fun gridTextFieldColors(
     errorCursorColor: Color = Color.White,
     focusedBorderColor: Color = MaterialTheme.colorScheme.primary,
     unfocusedBorderColor: Color = Color.Transparent,
-) = if(isSystemInDarkTheme()) {
-    OutlinedTextFieldDefaults.colors(
-        focusedTextColor = focusedTextColor,
-        unfocusedTextColor = unfocusedTextColor,
-        disabledTextColor = disabledTextColor,
-        focusedContainerColor = focusedContainerColor,
-        unfocusedContainerColor = unfocusedContainerColor,
-        cursorColor = cursorColor,
-        errorCursorColor = errorCursorColor,
-        focusedBorderColor = focusedBorderColor,
-        unfocusedBorderColor = unfocusedBorderColor,
-    )
-} else {
-    OutlinedTextFieldDefaults.colors()
-}
+) = OutlinedTextFieldDefaults.colors(
+    focusedTextColor = focusedTextColor,
+    unfocusedTextColor = unfocusedTextColor,
+    disabledTextColor = disabledTextColor,
+    focusedContainerColor = focusedContainerColor,
+    unfocusedContainerColor = unfocusedContainerColor,
+    cursorColor = cursorColor,
+    errorCursorColor = errorCursorColor,
+    focusedBorderColor = focusedBorderColor,
+    unfocusedBorderColor = unfocusedBorderColor,
+)
+
+
+@Composable
+fun sessionListCardColors(
+
+) = CardDefaults.cardColors(
+    containerColor = MaterialTheme.colorScheme.primaryContainer
+)

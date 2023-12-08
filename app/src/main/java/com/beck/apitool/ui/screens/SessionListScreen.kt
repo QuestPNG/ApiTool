@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import com.beck.apitool.MainViewModel
+import com.beck.apitool.ui.common.sessionListCardColors
 
 // val mockSessionList = listOf("mySession", "theSeissoin", "alsdkfj")
 val mockSession = Session(
@@ -67,11 +68,13 @@ data class BorderStroke(val width: Dp, val brush: Brush)
 @Composable
 fun SessionListScreen(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    openHttpSession: () -> Unit,
+    openWsSession: () -> Unit
 ) {
-    var showWebSockets by remember { mutableStateOf(true) }
+    var showWebSockets by remember { mutableStateOf(false) }
 
-    val sessions = viewModel.savedSessions
+    val sessions = viewModel.savedSessions.value
     Box(
         modifier = modifier.fillMaxSize()
     ) {
@@ -98,7 +101,7 @@ fun SessionListScreen(
                 Card(
                     modifier = Modifier
                         .weight(1f)
-                        .border(BorderStroke(2.dp, MaterialTheme.colorScheme.primary))
+                        //.border(BorderStroke(2.dp, MaterialTheme.colorScheme.primary))
                         .clickable {
                             showWebSockets = false
                         },
@@ -123,7 +126,7 @@ fun SessionListScreen(
                 Card(
                     modifier = Modifier
                         .weight(1f)
-                        .border(BorderStroke(2.dp, MaterialTheme.colorScheme.primary))
+                        //.border(BorderStroke(2.dp, MaterialTheme.colorScheme.primary))
                         .clickable {
                             showWebSockets = true
                         },
@@ -149,21 +152,31 @@ fun SessionListScreen(
             }
             LazyColumn() {
                 items(sessions) {
-                    if (showWebSockets)
+                    if (showWebSockets) {
                         if (it.isWebsocketSession) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Card(
-                                    modifier = Modifier.weight(0.9f)
-                                ){
-                                    Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(8.dp)){
-                                        Text(it.title)
-                                    }
+                                    modifier = Modifier
+                                        .weight(0.9f)
+                                        .padding(vertical = 4.dp)
+                                        .clickable {
+                                            viewModel.loadSession(it)
+                                            openWsSession()
+                                        },
+                                    colors = sessionListCardColors()
+                                ) {
+                                    Text(
+                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                        text = it.title
+                                    )
                                 }
                                 IconButton(
-                                    onClick = {},
+                                    onClick = {
+                                        viewModel.deleteSession(it)
+                                    },
                                 ) {
                                     Icon(
                                         Icons.Default.Close,
@@ -174,6 +187,41 @@ fun SessionListScreen(
                                 }
                             }
                         }
+                    } else {
+                        if(!it.isWebsocketSession) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Card(
+                                    modifier = Modifier
+                                        .weight(0.9f)
+                                        .clickable {
+                                            viewModel.loadSession(it)
+                                            openHttpSession()
+                                        },
+                                    colors = sessionListCardColors()
+                                ) {
+                                    Text(
+                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                        text = it.title
+                                    )
+                                }
+                                IconButton(
+                                    onClick = {
+                                        viewModel.deleteSession(it)
+                                    },
+                                ) {
+                                    Icon(
+                                        Icons.Default.Close,
+                                        modifier = Modifier.weight(0.1f),
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.error
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

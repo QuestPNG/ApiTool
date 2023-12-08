@@ -1,40 +1,52 @@
 package com.beck.apitool.ui.theme
 
 import android.app.Activity
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = lavender,
-    onPrimary = mantle,
-    primaryContainer = base,
-    onPrimaryContainer = text,
-    secondary = peach,
-    onSecondary = mantle,
-    tertiary = blue,
-    background = mantle,
-    surface = crust,
-    onSurface = text,
-    surfaceVariant = mantle,
-    secondaryContainer = mantle,
-    onBackground = text,
+    primary =               frappe_lavender,
+    onPrimary =             frappe_mantle,
+    primaryContainer =      frappe_base,
+    onPrimaryContainer =    frappe_text,
+    secondary =             frappe_peach,
+    onSecondary =           frappe_mantle,
+    tertiary =              frappe_blue,
+    background =            frappe_mantle,
+    surface =               frappe_crust,
+    onSurface =             frappe_text,
+    surfaceVariant =        frappe_mantle,
+    secondaryContainer =    frappe_mantle,
+    onBackground =          frappe_text,
 
-    error = red,
+    error = frappe_red,
 )
 
 private val LightColorScheme = lightColorScheme(
+    primary =               latte_lavender,
+    onPrimary =             latte_mantle,
+    primaryContainer =      latte_base,
+    onPrimaryContainer =    latte_text,
+    secondary =             latte_peach,
+    onSecondary =           latte_mantle,
+    tertiary =              latte_blue,
+    background =            latte_mantle,
+    surface =               latte_crust,
+    onSurface =             latte_text,
+    surfaceVariant =        latte_mantle,
+    secondaryContainer =    latte_mantle,
+    onBackground =          latte_text,
+
+    error =                 latte_red,
+)
+/*private val LightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
     tertiary = Pink40
@@ -48,7 +60,7 @@ private val LightColorScheme = lightColorScheme(
     onBackground = Color(0xFF1C1B1F),
     onSurface = Color(0xFF1C1B1F),
     */
-)
+)*/
 
 @Composable
 fun ApiToolTheme(

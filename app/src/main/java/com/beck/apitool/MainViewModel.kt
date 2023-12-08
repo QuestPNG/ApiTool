@@ -1,6 +1,7 @@
 package com.beck.apitool
 
 import android.util.Log
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,6 +13,7 @@ import io.ktor.client.plugins.logging.Logging
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
@@ -38,7 +40,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 enum class LoadingStatus {
     LOADING,
@@ -83,6 +89,7 @@ data class wsMessage(
     DELETE
 }*/
 
+@Serializable
 data class GridRowState (
     val key: String,
     val value: String,
@@ -103,12 +110,15 @@ class MainViewModel(private val db: Database): ViewModel() {
 
     val url = MutableLiveData<String>()
 
+    private val _sessionIsWebsocket = MutableStateFlow(false)
+    val sessionIsWebsocket = _sessionIsWebsocket.asStateFlow()
 
     private val _composeUrl = MutableStateFlow("")
     val composeUrl = _composeUrl.asStateFlow()
 
     val requestBody = MutableLiveData<String>()
     val responseView = MutableLiveData<String>()
+
 
     val webSocketResponseView = mutableStateListOf<wsMessage>()
     val wsMessageFlow = MutableSharedFlow<String>()
@@ -131,7 +141,8 @@ class MainViewModel(private val db: Database): ViewModel() {
     private val _bodyState = MutableStateFlow("")
     val bodyState = _bodyState.asStateFlow()
 
-     val savedSessions = mutableStateListOf<Session>()
+     //val savedSessions = mutableStateListOf<Session>()
+    val savedSessions: MutableState<List<Session>> = mutableStateOf(listOf())
     val spinnerState = MutableLiveData<Int>()
 
     fun httpRequest(protocol: String?) {
@@ -174,7 +185,6 @@ class MainViewModel(private val db: Database): ViewModel() {
         }
         isLoading.value = false
     }
-
     fun openConnection(){
         viewModelScope.launch{
             val wsRequest = _composeUrl.value // get viewmodel variable
@@ -222,9 +232,67 @@ class MainViewModel(private val db: Database): ViewModel() {
         }
     }
 
+    fun newSession(isWebSocket: Boolean) {
+        _sessionIsWebsocket.value = isWebSocket
+
+        _composeUrl.value = ""
+        _bodyState.value = ""
+        headerState.clear()
+        queryState.clear()
+        _composeResponseView.value = ""
+        webSocketResponseView.clear()
+    }
+
+    fun loadSession(session: Session) {
+        _sessionIsWebsocket.value = session.isWebsocketSession
+        _composeUrl.value = session.url
+        _bodyState.value = session.body ?: ""
+        headerState.clear()
+        queryState.clear()
+        try {
+            val headers = Json.decodeFromString<List<GridRowState>>(session.headers)
+            headerState.addAll(headers)
+            val queryParams = Json.decodeFromString<List<GridRowState>>(session.queryParams)
+            queryState.addAll(queryParams)
+        } catch(e: Exception) {
+            Log.e("MainViewModel.loadSession", e.stackTraceToString())
+        }
+    }
+    fun saveSession(title: String, isWebSocket: Boolean) {
+        val headerString = Json.encodeToString(headerState.toList())
+        val queryString = Json.encodeToString(queryState.toList())
+        /*val methodString = if(!isWebSocket) {
+            Json.encodeToString(currentMethod.value)
+        } else {
+            null
+        }*/
+        val session = Session(
+            isWebsocketSession = isWebSocket,
+            title = title,
+            url = composeUrl.value,
+            body = bodyState.value,
+            headers = headerString,
+            queryParams = queryString,
+            method = null
+        )
+        viewModelScope.launch {
+            try {
+                db.sessionDao().create(session)
+            } catch(e: Exception) {
+                Log.e("ViewModel.saveSession", e.stackTraceToString())
+            }
+        }
+    }
+    fun deleteSession(session: Session) {
+        viewModelScope.launch {
+            db.sessionDao().delete(session)
+            getSavedSessions()
+        }
+    }
     fun getSavedSessions() {
         viewModelScope.launch {
-            savedSessions.addAll(db.sessionDao().getAll())
+            //savedSessions.addAll(db.sessionDao().getAll())
+            savedSessions.value = db.sessionDao().getAll()
         }
     }
     fun sendWsMessage(){

@@ -3,53 +3,28 @@ package com.beck.apitool.ui.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.beck.apitool.ComposeGrid
-import com.beck.apitool.InputTabBar
-import com.beck.apitool.InputView
 import com.beck.apitool.MainViewModel
 import com.beck.apitool.ui.common.gridTextFieldColors
-import com.beck.apitool.ui.theme.ApiToolTheme
-import com.beck.apitool.wsMessage
-import io.ktor.client.request.request
-import io.ktor.http.HttpMethod
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
-import com.beck.apitool.ui.theme.text
 import com.beck.apitool.wsMessageType
-import androidx.compose.material3.Icon
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import com.beck.apitool.MainViewModelFactory
-import com.beck.apitool.R
 
 @Composable
 fun WsScreen(
@@ -58,13 +33,13 @@ fun WsScreen(
 ){
     val url = viewModel.composeUrl.collectAsState()
     Box(modifier = modifier
-            .padding(vertical = 8.dp)
-            .fillMaxSize()
+        .padding(vertical = 8.dp)
+        .fillMaxSize()
     ){
         ConstraintLayout(
                 modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth()
+                    .padding(8.dp)
+                    .fillMaxWidth()
         ) {
             val urlLabel = createRef()
             val responseLabel = createRef()
@@ -104,17 +79,17 @@ fun WsScreen(
             }
 
             Button(
-                    modifier = Modifier.constrainAs(connButton){
+                modifier = Modifier.constrainAs(connButton){
                     top.linkTo(urlLabel.bottom)
                     end.linkTo(parent.end)
-            },
-                    onClick = {
-                        viewModel.openConnection()
-                    }) {
+                },
+                onClick = {
+                    viewModel.openConnection()
+                }) {
                 Text(
-                        "Connect",
-                        fontSize = 16.sp,
-                        overflow = TextOverflow.Clip
+                    "Connect",
+                    fontSize = 16.sp,
+                    overflow = TextOverflow.Clip
                 )
             }
 
