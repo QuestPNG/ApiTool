@@ -21,8 +21,8 @@ class ComposeMainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    HttpScreen()
-                    //WsScreen()
+                    //HttpScreen()
+                    WsScreen()
                 }
             }
         }

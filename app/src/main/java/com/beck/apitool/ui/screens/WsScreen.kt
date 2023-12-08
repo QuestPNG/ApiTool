@@ -46,6 +46,7 @@ import androidx.compose.material3.Card
 import com.beck.apitool.ui.theme.text
 import com.beck.apitool.wsMessageType
 import androidx.compose.material3.Icon
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.beck.apitool.R
@@ -169,22 +170,36 @@ fun WsScreen(
 
                 items(viewModel.webSocketResponseView){
                     if(it.type == wsMessageType.INCOMING){
-                        Column(modifier = Modifier.fillMaxWidth() , horizontalAlignment = Alignment.Start){
+                        Column(modifier = Modifier.fillMaxWidth().padding(end = 10.dp) , horizontalAlignment = Alignment.Start){
                             Card(){
-                                Box(modifier = Modifier.padding(8.dp),
+                                Box(
                                     contentAlignment = Alignment.Center){
-                                    Text(text = it.content)
+                                    Text(   modifier = Modifier.padding(start = 24.dp),
+                                            text = it.content)
+                                    Icon(
+                                            painter = painterResource(R.drawable.incoming),
+                                            contentDescription = stringResource(id = R.string.incoming_desc),
+                                            tint = Color(0xFFca9ee6),
+                                            modifier = Modifier.align(Alignment.TopStart)
+                                    )
                                 }
                             }
                         }
                     }else if(it.type == wsMessageType.OUTGOING){
-                        Column(modifier = Modifier.fillMaxWidth() , horizontalAlignment = Alignment.End){
+                        Column(modifier = Modifier.fillMaxWidth().padding(start = 10.dp) , horizontalAlignment = Alignment.End){
                             Card(){
-                                Box(modifier = Modifier.padding(8.dp),
+                                Box(
                                         contentAlignment = Alignment.Center){
-                                    Text(text = it.content)
-
+                                    Text(   modifier = Modifier.padding(end = 24.dp),
+                                            text = it.content)
+                                    Icon(
+                                            painter = painterResource(R.drawable.outgoing),
+                                            contentDescription = stringResource(id = R.string.outgoing_desc),
+                                            tint = Color(0xFF8caaee),
+                                            modifier = Modifier.padding(start = 3.dp).align(Alignment.TopEnd)
+                                    )
                                 }
+
                             }
                         }
                     }
