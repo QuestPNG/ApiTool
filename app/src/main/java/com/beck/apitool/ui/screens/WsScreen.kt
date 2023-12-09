@@ -43,7 +43,6 @@ import io.ktor.http.HttpMethod
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
-import com.beck.apitool.ui.theme.text
 import com.beck.apitool.wsMessageType
 import androidx.compose.material3.Icon
 import androidx.compose.ui.graphics.Color
@@ -54,7 +53,7 @@ import com.beck.apitool.R
 @Composable
 fun WsScreen(
         modifier: Modifier = Modifier,
-        viewModel: MainViewModel = MainViewModel()
+        viewModel: MainViewModel
 ){
     val url = viewModel.composeUrl.collectAsState()
     Box(modifier = modifier
@@ -75,14 +74,12 @@ fun WsScreen(
             val sendButton = createRef()
 
             Row(
-                    modifier
-                            .fillMaxWidth()
-                            .constrainAs(urlLabel) {
-                                top.linkTo(parent.top, margin = 8.dp)
-
-
-                            },
-                    verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .constrainAs(urlLabel) {
+                        top.linkTo(parent.top, margin = 8.dp)
+                    },
+                verticalAlignment = Alignment.CenterVertically
             ){
                 Text(
                     text = "URL:",
@@ -211,6 +208,7 @@ fun WsScreen(
     }
 }
 
+/*
 @Preview(showSystemUi = true)
 @Composable
 fun WsPreview(){
@@ -218,6 +216,7 @@ fun WsPreview(){
         WsScreen()
     }
 }
+ */
 
 
 
